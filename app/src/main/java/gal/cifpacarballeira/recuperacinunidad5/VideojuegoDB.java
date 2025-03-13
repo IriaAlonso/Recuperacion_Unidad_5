@@ -65,23 +65,56 @@ public class VideojuegoDB extends SQLiteOpenHelper {
         // Insertar el videojuego en la base de datos y obtener el ID
         long id = db.insert(TABLE_VIDEOJUEGOS, null, values);
 
-        // Cerrar la base de datos
-
+        db.close();
         return id;
     }
 
+    /**
+     * Método para obtener todos los videojuegos almacenados en la base de datos.
+     *
+     * @return Lista de videojuegos.
+     */
     public List<Videojuego> getVideojuegos() {
         SQLiteDatabase db = this.getReadableDatabase();
         List<Videojuego> videojuegoList = new ArrayList<>();
-        Cursor cursor = db.query("videojuegos", null, null, null, null, null, null);
+        Cursor cursor = db.query(TABLE_VIDEOJUEGOS, null, null, null, null, null, null);
+
         if (cursor.moveToFirst()) {
             do {
                 videojuegoList.add(Videojuego.fromCursor(cursor));
             } while (cursor.moveToNext());
         }
-        cursor.close();
 
+        cursor.close();
         return videojuegoList;
     }
 
+    /**
+     * Método para actualizar un videojuego en la base de datos.
+     * Este método sigue el patrón del ejemplo `updateHomework()`.
+     *
+     * @param id El ID del videojuego a actualizar.
+     * @param videojuego El objeto Videojuego con los nuevos datos.
+     * @return Número de filas afectadas (1 si se actualizó correctamente, 0 si falló).
+     */
+    public int actualizarVideojuego(long id, Videojuego videojuego) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        // Crear un ContentValues con los datos actualizados del videojuego
+        ContentValues values = new ContentValues();
+        values.put("titulo", videojuego.getTitulo());
+        values.put("puntuacion", videojuego.getPuntuacion());
+        values.put("estado", videojuego.getEstado().name()); // Asumimos que EstadoJuego es un enum
+
+        // Realizar la actualización en la base de datos
+        int rowsUpdated = db.update(
+                TABLE_VIDEOJUEGOS, // Nombre de la tabla
+                values,            // Contenido con los datos a actualizar
+                "id = ?",          // Condición para identificar el videojuego
+                new String[]{String.valueOf(id)}  // ID del videojuego a actualizar
+        );
+
+
+        return rowsUpdated; // Retorna el número de filas actualizadas
+    }
 }

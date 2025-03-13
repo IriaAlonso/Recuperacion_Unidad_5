@@ -48,13 +48,27 @@ public class VideojuegoViewModel extends AndroidViewModel {
         database.agregarVideojuego(videojuego); // Guardamos en la base de datos
     }
 
-    // Eliminar un videojuego de la lista (falta implementar en la BD)
+    // Modificar un videojuego en la lista y actualizarlo en la base de datos
+    public void actualizarVideojuego(Videojuego videojuegoAntiguo, Videojuego videojuegoNuevo) {
+        List<Videojuego> juegosActuales = new ArrayList<>(listaVideojuegos.getValue()); // Copia defensiva
+        int index = juegosActuales.indexOf(videojuegoAntiguo);
+        if (index != -1) {
+            juegosActuales.set(index, videojuegoNuevo); // Reemplazamos el videojuego antiguo por el nuevo
+            listaVideojuegos.setValue(juegosActuales); // Actualizamos la lista en el LiveData
+
+            // Actualizamos la base de datos
+            database.actualizarVideojuego(videojuegoAntiguo.getId(), videojuegoNuevo);
+        }
+    }
+
+    // Eliminar un videojuego de la lista y de la base de datos
     public void eliminarVideojuego(Videojuego videojuego) {
         List<Videojuego> juegosActuales = new ArrayList<>(listaVideojuegos.getValue()); // Copia defensiva
         juegosActuales.remove(videojuego);
         listaVideojuegos.setValue(juegosActuales);
 
-        // Aquí podríamos implementar un método en la BD para eliminarlo
+        // Eliminar de la base de datos
+        //database.eliminarVideojuego(videojuego);
     }
 
     // Cargar los videojuegos desde la base de datos al iniciar la app

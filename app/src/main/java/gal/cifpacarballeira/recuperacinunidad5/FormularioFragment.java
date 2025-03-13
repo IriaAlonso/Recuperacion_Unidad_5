@@ -1,6 +1,5 @@
 package gal.cifpacarballeira.recuperacinunidad5;
 
-import android.content.ContentValues;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -43,6 +42,7 @@ public class FormularioFragment extends Fragment {
         // Inicializar la base de datos
         dbHelper = new VideojuegoDB(requireContext());
         dbHelper.getWritableDatabase();
+
         // Referencias a los elementos de la vista
         tituloEditText = view.findViewById(R.id.tituloEditText);
         puntuacionRadioGroup = view.findViewById(R.id.puntuacionRadioGroup);
@@ -127,8 +127,18 @@ public class FormularioFragment extends Fragment {
             // Crear un nuevo videojuego con los datos modificados
             Videojuego videojuegoModificado = new Videojuego(titulo, puntuacion, estado);
 
-            // Actualizar el videojuego en el ViewModel
-            //videojuegoViewModel.actualizarVideojuego(videojuegoSeleccionado, videojuegoModificado);
+            // Actualizar el videojuego en la base de datos
+            int filasAfectadas = dbHelper.actualizarVideojuego(videojuegoSeleccionado.getId(), videojuegoModificado);
+
+            if (filasAfectadas > 0) {
+                Toast.makeText(requireContext(), "Videojuego actualizado con éxito", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(requireContext(), "Error al actualizar el videojuego", Toast.LENGTH_SHORT).show();
+            }
+
+            // También actualizamos el videojuego en el ViewModel
+            videojuegoViewModel.actualizarVideojuego(videojuegoSeleccionado, videojuegoModificado);
+
             limpiar();
         }
     }
@@ -137,6 +147,10 @@ public class FormularioFragment extends Fragment {
         if (videojuegoSeleccionado != null) {
             // Eliminar el videojuego seleccionado de la lista
             videojuegoViewModel.eliminarVideojuego(videojuegoSeleccionado);
+
+            // Eliminar el videojuego de la base de datos
+           // dbHelper.eliminarVideojuego(videojuegoSeleccionado);
+
             limpiar();
         }
     }
