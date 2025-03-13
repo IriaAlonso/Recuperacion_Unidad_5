@@ -1,5 +1,7 @@
 package gal.cifpacarballeira.recuperacinunidad5;
 
+import android.database.Cursor;
+
 /**
  * Clase para representar un videojuego.
  */
@@ -45,6 +47,15 @@ public class Videojuego {
                 ", puntuacion=" + puntuacion +
                 ", estado=" + estado +
                 '}';
+    }
+    public static Videojuego fromCursor(Cursor cursor) {
+        long id = cursor.getLong(cursor.getColumnIndexOrThrow("id"));
+        String titulo = cursor.getString(cursor.getColumnIndexOrThrow("titulo"));
+        int puntuacion = cursor.getInt(cursor.getColumnIndexOrThrow("puntuacion"));
+        EstadoJuego estado = EstadoJuego.valueOf(cursor.getString(cursor.getColumnIndexOrThrow("estado")));
+
+
+        return new Videojuego(titulo, puntuacion, estado);
     }
 }
 
