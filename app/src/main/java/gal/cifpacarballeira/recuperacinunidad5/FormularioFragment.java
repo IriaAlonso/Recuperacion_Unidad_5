@@ -1,5 +1,6 @@
 package gal.cifpacarballeira.recuperacinunidad5;
 
+import android.content.ContentValues;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,6 +10,7 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.ArrayAdapter;
+import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -23,6 +25,8 @@ public class FormularioFragment extends Fragment {
     private Spinner estadoSpinner;
     private Videojuego videojuegoSeleccionado;
 
+    private VideojuegoDB dbHelper;  // Instancia para interactuar con la base de datos
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -36,6 +40,9 @@ public class FormularioFragment extends Fragment {
         // Inicializar el ViewModel para compartir datos entre fragments
         videojuegoViewModel = new ViewModelProvider(requireActivity()).get(VideojuegoViewModel.class);
 
+        // Inicializar la base de datos
+        dbHelper = new VideojuegoDB(requireContext());
+        dbHelper.getWritableDatabase();
         // Referencias a los elementos de la vista
         tituloEditText = view.findViewById(R.id.tituloEditText);
         puntuacionRadioGroup = view.findViewById(R.id.puntuacionRadioGroup);
@@ -51,7 +58,7 @@ public class FormularioFragment extends Fragment {
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         estadoSpinner.setAdapter(adapter);
 
-        // Configurar el botón para agregar un videojuego a la lista
+        // Configurar el botón para agregar un videojuego a la base de datos
         guardarButton.setOnClickListener(v -> agregarVideojuego());
 
         // Configurar el botón para modificar un videojuego
@@ -95,8 +102,18 @@ public class FormularioFragment extends Fragment {
         EstadoJuego estado = (EstadoJuego) estadoSpinner.getSelectedItem();
 
         if (!titulo.isEmpty() && puntuacion != -1) {
+            // Crear el objeto Videojuego
             Videojuego nuevoJuego = new Videojuego(titulo, puntuacion, estado);
-            videojuegoViewModel.agregarVideojuego(nuevoJuego); // Agregar videojuego al ViewModel
+            videojuegoViewModel.agregarVideojuego(nuevoJuego);
+            // Agregar el videojuego a la base de datos
+            long id = dbHelper.agregarVideojuego(nuevoJuego);  // Usamos la instancia de la base de datos para agregar el videojuego
+
+            if (id != -1) {
+                Toast.makeText(requireContext(), "Videojuego agregado con éxito", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(requireContext(), "Error al agregar el videojuego", Toast.LENGTH_SHORT).show();
+            }
+
             limpiar();
         }
     }
