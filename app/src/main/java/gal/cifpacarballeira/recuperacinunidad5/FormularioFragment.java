@@ -128,7 +128,7 @@ public class FormularioFragment extends Fragment {
             Videojuego videojuegoModificado = new Videojuego(titulo, puntuacion, estado);
 
             // Actualizar el videojuego en el ViewModel
-            videojuegoViewModel.actualizarVideojuego(videojuegoSeleccionado, videojuegoModificado);
+            //videojuegoViewModel.actualizarVideojuego(videojuegoSeleccionado, videojuegoModificado);
             limpiar();
         }
     }
