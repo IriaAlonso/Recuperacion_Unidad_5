@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import java.util.ArrayList;
 import java.util.List;
 
 public class ListaFragment extends Fragment {
@@ -39,10 +40,10 @@ public class ListaFragment extends Fragment {
         // Inicializar el ViewModel
         videojuegoViewModel = new ViewModelProvider(requireActivity()).get(VideojuegoViewModel.class);
 
-        // Generar la lista de videojuegos inicial
-        videojuegos = VideojuegoGenerator.generarVideojuegos();
+        // Inicializar la lista vacía (sin llamar a VideojuegoGenerator)
+        videojuegos = new ArrayList<>();
 
-        // Crear el adaptador con la lista de videojuegos
+        // Crear el adaptador con la lista vacía
         videojuegoAdapter = new VideojuegoAdapter(videojuegos, new VideojuegoAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(Videojuego videojuego) {
@@ -64,6 +65,4 @@ public class ListaFragment extends Fragment {
 
         return view;
     }
-
-
 }

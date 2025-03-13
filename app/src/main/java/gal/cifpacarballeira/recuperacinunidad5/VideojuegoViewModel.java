@@ -3,21 +3,19 @@ package gal.cifpacarballeira.recuperacinunidad5;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
-
 import java.util.ArrayList;
 import java.util.List;
 
 public class VideojuegoViewModel extends ViewModel {
 
-    // Lista de videojuegos
+    // Lista de videojuegos (inicialmente vacía)
     private final MutableLiveData<List<Videojuego>> listaVideojuegos = new MutableLiveData<>(new ArrayList<>());
 
     // Videojuego seleccionado
     private final MutableLiveData<Videojuego> videojuegoSeleccionado = new MutableLiveData<>();
 
     public VideojuegoViewModel() {
-        // Cargar los videojuegos predeterminados
-        cargarVideojuegosIniciales(); // Descomentar para inicializar correctamente
+        // No llamamos a cargarVideojuegosIniciales(), así que la lista permanece vacía
     }
 
     // Obtener la lista de videojuegos
@@ -59,15 +57,9 @@ public class VideojuegoViewModel extends ViewModel {
         }
     }
 
-    // Limpiar la lista de videojuegos y restaurar los videojuegos iniciales
+    // Limpiar la lista de videojuegos sin inicializarla de nuevo
     public void limpiar() {
-        cargarVideojuegosIniciales(); // Restauramos los videojuegos predeterminados
+        listaVideojuegos.setValue(new ArrayList<>()); // Se deja la lista vacía
         videojuegoSeleccionado.setValue(null); // Limpiamos el videojuego seleccionado
-    }
-
-    // Método para cargar los videojuegos predeterminados (inicialización de la lista)
-    private void cargarVideojuegosIniciales() {
-        List<Videojuego> videojuegosGenerados = VideojuegoGenerator.generarVideojuegos();
-        listaVideojuegos.setValue(videojuegosGenerados);
     }
 }
