@@ -5,26 +5,18 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Clase para gestionar la base de datos de videojuegos.
- */
 public class VideojuegoDB extends SQLiteOpenHelper {
 
-    // Nombre y versión de la base de datos
     private static final String DB_NAME = "videojuegosdb";
     private static final int DB_VERSION = 1;
-
-    // Nombre de la tabla
     private static final String TABLE_VIDEOJUEGOS = "videojuegos";
 
-    // Definición de la tabla
     private static final String CREATE_TABLE = "CREATE TABLE " + TABLE_VIDEOJUEGOS + " (" +
             "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
-            "titulo TEXT, " +
+            "titulo TEXT UNIQUE, " +  // Se asume que el título es único
             "puntuacion INTEGER, " +
             "estado TEXT" +
             ")";
@@ -35,45 +27,27 @@ public class VideojuegoDB extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        // Crear la tabla
         db.execSQL(CREATE_TABLE);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        // Si la base de datos existe y se necesita una actualización, eliminar la tabla existente
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_VIDEOJUEGOS);
-        // Vuelve a crear la tabla
         onCreate(db);
     }
 
-    /**
-     * Método para agregar un videojuego a la base de datos.
-     *
-     * @param videojuego El videojuego a agregar.
-     * @return El ID del videojuego insertado.
-     */
     public long agregarVideojuego(Videojuego videojuego) {
         SQLiteDatabase db = this.getWritableDatabase();
-
-        // Crear un ContentValues con los datos del videojuego
         ContentValues values = new ContentValues();
         values.put("titulo", videojuego.getTitulo());
         values.put("puntuacion", videojuego.getPuntuacion());
         values.put("estado", videojuego.getEstado().name());
 
-        // Insertar el videojuego en la base de datos y obtener el ID
         long id = db.insert(TABLE_VIDEOJUEGOS, null, values);
 
-        db.close();
         return id;
     }
 
-    /**
-     * Método para obtener todos los videojuegos almacenados en la base de datos.
-     *
-     * @return Lista de videojuegos.
-     */
     public List<Videojuego> getVideojuegos() {
         SQLiteDatabase db = this.getReadableDatabase();
         List<Videojuego> videojuegoList = new ArrayList<>();
@@ -86,35 +60,26 @@ public class VideojuegoDB extends SQLiteOpenHelper {
         }
 
         cursor.close();
+
         return videojuegoList;
     }
 
-    /**
-     * Método para actualizar un videojuego en la base de datos.
-     * Este método sigue el patrón del ejemplo `updateHomework()`.
-     *
-     * @param id El ID del videojuego a actualizar.
-     * @param videojuego El objeto Videojuego con los nuevos datos.
-     * @return Número de filas afectadas (1 si se actualizó correctamente, 0 si falló).
-     */
-    public int actualizarVideojuego(long id, Videojuego videojuego) {
+    public int actualizarVideojuego(String tituloAntiguo, Videojuego videojuegoNuevo) {
         SQLiteDatabase db = this.getWritableDatabase();
-
-        // Crear un ContentValues con los datos actualizados del videojuego
         ContentValues values = new ContentValues();
-        values.put("titulo", videojuego.getTitulo());
-        values.put("puntuacion", videojuego.getPuntuacion());
-        values.put("estado", videojuego.getEstado().name()); // Asumimos que EstadoJuego es un enum
+        values.put("titulo", videojuegoNuevo.getTitulo());
+        values.put("puntuacion", videojuegoNuevo.getPuntuacion());
+        values.put("estado", videojuegoNuevo.getEstado().name());
 
-        // Realizar la actualización en la base de datos
-        int rowsUpdated = db.update(
-                TABLE_VIDEOJUEGOS, // Nombre de la tabla
-                values,            // Contenido con los datos a actualizar
-                "id = ?",          // Condición para identificar el videojuego
-                new String[]{String.valueOf(id)}  // ID del videojuego a actualizar
-        );
+        int rowsUpdated = db.update(TABLE_VIDEOJUEGOS, values, "titulo = ?", new String[]{tituloAntiguo});
 
+        return rowsUpdated;
+    }
 
-        return rowsUpdated; // Retorna el número de filas actualizadas
+    public int eliminarVideojuego(String titulo) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        int rowsDeleted = db.delete(TABLE_VIDEOJUEGOS, "titulo = ?", new String[]{titulo});
+
+        return rowsDeleted;
     }
 }
